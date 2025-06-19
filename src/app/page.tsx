@@ -4,10 +4,6 @@ import { FiLoader, FiCheckCircle, FiRefreshCw, FiShoppingCart, FiEye, FiXCircle 
 
 const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
 
-function getRandomStockStatus() {
-  return Math.random() > 0.5 ? "In Stock" : "Out of Stock";
-}
-
 type PartAlternative = {
   part_number: string;
   brand: string;
@@ -90,11 +86,6 @@ export default function Home() {
     }
   };
 
-  const openModal = (partNumber: string, brand: string) => {
-    setSelectedPart({ partNumber, brand });
-    setModalOpen(true);
-    setTimeout(() => nameRef.current?.focus(), 100); // Focus name field
-  };
   const closeModal = () => {
     setModalOpen(false);
     setSelectedPart(null);
@@ -107,14 +98,14 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-start bg-gray-100">
+    <div className="min-h-screen w-full flex flex-col items-center justify-start bg-gray-100 px-2 sm:px-0">
       {/* Hero Section */}
-      <div className="w-full max-w-2xl mt-12 rounded-3xl shadow-2xl bg-white px-6 sm:px-12 pt-10 pb-8 flex flex-col items-center text-center border border-primary/20">
-        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-black mb-3 font-sans">AI Part Finder</h1>
-        <p className="text-lg sm:text-xl text-gray-700 font-normal mb-6 font-sans">Describe your part. We&apos;ll find it using AI.</p>
-        <form className="w-full max-w-xl flex flex-col gap-4 mx-auto mt-4" onSubmit={handleSubmit}>
+      <div className="w-full max-w-2xl mt-8 sm:mt-12 rounded-3xl shadow-2xl bg-white px-3 sm:px-6 md:px-12 pt-8 sm:pt-10 pb-6 sm:pb-8 flex flex-col items-center text-center border border-primary/20">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-black mb-2 sm:mb-3 font-sans">AI Part Finder</h1>
+        <p className="text-base sm:text-lg md:text-xl text-gray-700 font-normal mb-4 sm:mb-6 font-sans">Describe your part. We&apos;ll find it using AI.</p>
+        <form className="w-full max-w-xl flex flex-col gap-3 sm:gap-4 mx-auto mt-2 sm:mt-4" onSubmit={handleSubmit}>
           <textarea
-            className="w-full min-h-[110px] sm:min-h-[120px] rounded-2xl border border-primary/30 bg-gray-50 p-5 text-lg text-black shadow focus:outline-none focus:ring-2 focus:ring-primary transition-all placeholder:text-gray-400 font-sans"
+            className="w-full min-h-[90px] sm:min-h-[110px] md:min-h-[120px] rounded-2xl border border-primary/30 bg-gray-50 p-4 sm:p-5 text-base sm:text-lg text-black shadow focus:outline-none focus:ring-2 focus:ring-primary transition-all placeholder:text-gray-400 font-sans"
             placeholder="Enter part number or product description..."
             disabled={loading}
             value={query}
@@ -122,7 +113,7 @@ export default function Home() {
           />
           <button
             type="submit"
-            className={`w-full mt-2 py-4 rounded-full bg-black hover:bg-gray-900 text-white text-lg font-semibold shadow-lg border border-black focus:outline-none focus:ring-2 focus:ring-black active:scale-95 disabled:bg-gray-700 disabled:text-white/80 disabled:cursor-not-allowed transform-gpu hover:scale-[1.03] active:scale-95 font-sans flex items-center justify-center gap-2 transition-transform`}
+            className={`w-full mt-2 py-3 sm:py-4 rounded-full bg-black hover:bg-gray-900 text-white text-base sm:text-lg font-semibold shadow-lg border border-black focus:outline-none focus:ring-2 focus:ring-black active:scale-95 disabled:bg-gray-700 disabled:text-white/80 disabled:cursor-not-allowed transform-gpu hover:scale-[1.03] active:scale-95 font-sans flex items-center justify-center gap-2 transition-transform`}
             disabled={loading || !query.trim()}
           >
             {loading ? (<FiLoader className="animate-spin" />) : (<FiRefreshCw />)}
@@ -139,13 +130,13 @@ export default function Home() {
       )}
       {/* Product Result Card (from AI) */}
       {!loading && result && (
-        <div className="w-full max-w-3xl mt-12 px-4 sm:px-0">
-          <div className="w-full bg-white rounded-2xl shadow-2xl p-8 flex flex-col sm:flex-row gap-8 border-2 border-primary/20 relative">
+        <div className="w-full max-w-3xl mt-8 sm:mt-12 px-0 sm:px-4 md:px-0">
+          <div className="w-full bg-white rounded-2xl shadow-2xl p-4 sm:p-8 flex flex-col sm:flex-row gap-6 sm:gap-8 border-2 border-primary/20 relative">
             {/* Left: Image & Specs */}
-            <div className="flex-1 flex flex-col gap-4 items-start">
-              <div className="text-2xl font-bold text-black font-sans mb-1">{result.part_number}</div>
-              <div className="text-base text-black font-medium font-sans mb-1">{result.brand}</div>
-              <div className="text-base text-black font-sans mb-2">{result.description}</div>
+            <div className="flex-1 flex flex-col gap-3 sm:gap-4 items-start">
+              <div className="text-2xl sm:text-3xl font-bold text-black font-sans mb-1">{result.part_number}</div>
+              <div className="text-base sm:text-lg text-black font-medium font-sans mb-1">{result.brand}</div>
+              <div className="text-base sm:text-lg text-black font-sans mb-2">{result.description}</div>
               {result.specs && result.specs.length > 0 && (
                 <div className="mt-1">
                   <div className="text-base font-bold text-black mb-1">Specs:</div>
@@ -159,15 +150,15 @@ export default function Home() {
               <div className="text-base text-black font-sans mt-2"><span className="font-bold">Application:</span> {result.application}</div>
             </div>
             {/* Right: Actions & Status */}
-            <div className="flex flex-col gap-4 items-end justify-between min-w-[180px] sm:min-w-[220px]">
-              <div className="flex items-center gap-2 mb-2">
+            <div className="flex flex-col gap-3 sm:gap-4 items-stretch sm:items-end justify-between min-w-0 sm:min-w-[180px] md:min-w-[220px] w-full sm:w-auto mt-4 sm:mt-0">
+              <div className="flex items-center gap-2 mb-2 sm:mb-0">
                 {result.stock === 'In Stock' ? (
                   <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-700 font-bold text-sm"><FiCheckCircle /> In Stock</span>
                 ) : (
                   <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-100 text-red-700 font-bold text-sm"><FiXCircle /> Out of Stock</span>
                 )}
               </div>
-              <div className="text-2xl font-bold text-black mb-2">$89.50</div>
+              <div className="text-xl sm:text-2xl font-bold text-black mb-2">$89.50</div>
               <div className="flex flex-col gap-2 w-full">
                 <button className="w-full py-3 rounded-full bg-black hover:bg-gray-900 text-white font-semibold shadow transition-all focus:outline-none focus:ring-2 focus:ring-black flex items-center justify-center gap-2 text-base transition-transform hover:scale-[1.03] active:scale-95 disabled:bg-gray-700 disabled:text-white/80 disabled:cursor-not-allowed" disabled={false}><FiEye /> View Product</button>
                 <button className="w-full py-3 rounded-full bg-black hover:bg-gray-900 text-white font-semibold shadow transition-all focus:outline-none focus:ring-2 focus:ring-black flex items-center justify-center gap-2 text-base transition-transform hover:scale-[1.03] active:scale-95 disabled:bg-gray-700 disabled:text-white/80 disabled:cursor-not-allowed" disabled={false}><FiShoppingCart /> Add to Quote</button>
@@ -178,7 +169,7 @@ export default function Home() {
       )}
       {/* Alternative Parts Section (from AI) */}
       {!loading && result && result.alternatives && result.alternatives.length > 0 && (
-        <div className="w-full max-w-3xl mt-10 px-4 sm:px-0 pb-10">
+        <div className="w-full max-w-3xl mt-8 sm:mt-10 px-0 sm:px-4 md:px-0 pb-10">
           <div className="flex items-center gap-2 mb-3 mt-8">
             <FiRefreshCw className="text-primary w-5 h-5" />
             <h2 className="text-base font-bold text-black">Suggested Alternatives</h2>
@@ -187,11 +178,11 @@ export default function Home() {
             {result.alternatives.map((alt, i) => (
               <div
                 key={i}
-                className="min-w-[85vw] max-w-full sm:min-w-0 sm:w-full bg-white rounded-2xl shadow-card border-2 border-primary/10 p-5 flex flex-col gap-3 transition-all flex-shrink-0 font-sans"
+                className="min-w-[90vw] sm:min-w-0 sm:w-full bg-white rounded-2xl shadow-card border-2 border-primary/10 p-4 sm:p-5 flex flex-col gap-3 transition-all flex-shrink-0 font-sans"
               >
-                <div className="text-lg font-bold text-black mb-1">{alt.part_number}</div>
-                <div className="text-base text-black font-medium mb-1">{alt.brand}</div>
-                <div className="text-sm text-black mb-2">{alt.description}</div>
+                <div className="text-lg sm:text-xl font-bold text-black mb-1">{alt.part_number}</div>
+                <div className="text-base sm:text-lg text-black font-medium mb-1">{alt.brand}</div>
+                <div className="text-sm sm:text-base text-black mb-2">{alt.description}</div>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {alt.specs && alt.specs.length > 0 && alt.specs.slice(0, 2).map((spec: string, j: number) => (
                     <span key={j} className="bg-primary/5 border border-primary/20 rounded-xl px-3 py-1 text-xs font-semibold text-black">{spec}</span>
