@@ -124,8 +124,8 @@ export default function Home() {
       {/* Loading Overlay */}
       {loading && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
-          <FiLoader className="w-12 h-12 text-primary animate-spin mb-4" />
-          <span className="text-gray-700 text-lg font-medium animate-pulse">Searching parts with AI…</span>
+          <FiLoader className="w-12 h-12 text-black animate-spin mb-4" />
+          <span className="text-black text-lg font-medium animate-pulse">Searching parts with AI…</span>
         </div>
       )}
       {/* Product Result Card (from AI) */}
