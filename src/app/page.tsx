@@ -51,7 +51,69 @@ export default function Home() {
         setLoading(false);
         return;
       }
-      const prompt = `You are an advanced AI assistant that specializes in identifying and cross-referencing industrial automation parts, including but not limited to PLCs, sensors, drives, HMIs, relays, connectors, and control components. Your primary goal is to help procurement engineers and maintenance technicians quickly identify the correct part and suitable alternatives.\n\nGiven a user's natural language query, perform the following tasks:\n\n1. **Extract the following fields for the most relevant part mentioned or implied**:\n   - "part_number": Official or most likely part number\n   - "brand": Manufacturer or recognized brand\n   - "description": Functional description of the part\n   - "specs": Key technical specifications as a bullet-point array (e.g., voltage, current, type, mounting, material)\n   - "application": Common or typical use-case context of the part\n   - "stock": Use either "In Stock" or "Out of Stock" based on availability cues in the query\n\n2. **Generate at least 3 high-quality alternative part suggestions**, following these strict rules:\n   - Alternatives must be **functionally equivalent or compatible** with the original part\n   - Prefer alternatives that are **drop-in replacements** or require **minimal modification**\n   - Consider **industry-recognized brands** only (e.g., Siemens, Allen-Bradley, Omron, Schneider Electric, Mitsubishi, etc.)\n   - Include **a mix of premium and cost-effective options**, if available\n   - Ensure each alternative has **clearly defined improvements or trade-offs** (e.g., wider voltage range, faster response time, smaller footprint)\n   - Vary in **stock availability**, brand, or technical attributes where applicable\n   - Do not suggest outdated, discontinued, or generic placeholders\n\n3. **Return the full response in this exact JSON format only** (no explanations, markdown, or commentary):\n\n{\n  "part_number": "string",\n  "brand": "string",\n  "description": "string",\n  "specs": ["string", "..."],\n  "application": "string",\n  "stock": "In Stock" | "Out of Stock",\n  "alternatives": [\n    {\n      "part_number": "string",\n      "brand": "string",\n      "description": "string",\n      "specs": ["string", "..."],\n      "application": "string",\n      "stock": "In Stock" | "Out of Stock"\n    },\n    ...\n  ]\n}\n\n**Important Behavior Rules**:\n- Always use real, known parts and brands — no made-up part numbers or companies.\n- Base all alternatives on practical replacement logic: technical match, brand equivalency, or market availability.\n- Alternatives should not be identical to each other unless that reflects real market redundancy.\n- Focus on **use-case fit**: match each alternative to the same or similar application scenario.\n`;
+      const prompt = `You are an advanced AI assistant that specializes in identifying and cross-referencing industrial automation parts, including but not limited to PLCs, sensors, drives, HMIs, relays, connectors, and control components. Your primary goal is to help procurement engineers and maintenance technicians quickly identify the correct part and suitable alternatives.
+
+Given a user's natural language query, perform the following tasks:
+
+1. **Extract the following fields for the most relevant part mentioned or implied**:
+   - "part_number": Official or most likely part number
+   - "brand": Manufacturer or recognized brand
+   - "description": Functional description of the part
+   - "specs": Exactly **6 key technical specifications** as a bullet-point array (e.g., voltage, current, type, mounting, material, interface, dimensions)
+   - "application": Common or typical use-case context of the part
+   - "stock": Use either "In Stock" or "Out of Stock" based on availability cues in the query
+
+2. **Generate at least 3 high-quality alternative part suggestions**, following these strict rules:
+   - Alternatives must be **functionally equivalent or compatible** with the original part
+   - Prefer alternatives that are **drop-in replacements** or require **minimal modification**
+   - Use only **real, industry-recognized brands** (e.g., Siemens, Allen-Bradley, Omron, Schneider Electric, Mitsubishi, etc.)
+   - Include a mix of **premium and cost-effective options**, where applicable
+   - Each alternative must also include **exactly 6 technical specifications**, distinct and relevant
+   - Ensure the alternatives vary in terms of **brand, stock availability, or performance trade-offs**
+   - Do not suggest outdated, discontinued, or generic placeholder parts
+
+3. **Return the full response in this exact JSON format only** (no explanations, markdown, or commentary):
+
+{
+  "part_number": "string",
+  "brand": "string",
+  "description": "string",
+  "specs": [
+    "spec 1",
+    "spec 2",
+    "spec 3",
+    "spec 4",
+    "spec 5",
+    "spec 6"
+  ],
+  "application": "string",
+  "stock": "In Stock" | "Out of Stock",
+  "alternatives": [
+    {
+      "part_number": "string",
+      "brand": "string",
+      "description": "string",
+      "specs": [
+        "spec 1",
+        "spec 2",
+        "spec 3",
+        "spec 4",
+        "spec 5",
+        "spec 6"
+      ],
+      "application": "string",
+      "stock": "In Stock" | "Out of Stock"
+    },
+    ...
+  ]
+}
+
+**Important Behavior Rules**:
+- Never provide fewer or more than **6 specifications** per part.
+- Use only realistic, verified part information — no imaginary data.
+- Alternatives must be based on meaningful equivalence or improvements, not duplicates.
+- Always match the **application use-case** when suggesting alternatives.
+`;
       
       
 
@@ -114,7 +176,7 @@ export default function Home() {
               disabled={loading}
               value={query}
               onChange={e => setQuery(e.target.value)}
-            />
+        />
             <button
               type="submit"
               className={`w-full mt-2 py-3 sm:py-4 rounded-full bg-black hover:bg-gray-900 text-white text-base sm:text-lg font-semibold shadow-lg border border-black focus:outline-none focus:ring-2 focus:ring-black active:scale-95 disabled:bg-gray-700 disabled:text-white/80 disabled:cursor-not-allowed transform-gpu hover:scale-[1.03] active:scale-95 font-sans flex items-center justify-center gap-2 transition-transform`}
@@ -148,7 +210,7 @@ export default function Home() {
             {/* Specs */}
             {result.specs && result.specs.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
-                {result.specs.slice(0, 4).map((spec, i) => (
+                {result.specs.map((spec, i) => (
                   <span key={i} className="bg-gray-50 border border-gray-200 rounded-full px-4 py-1 text-sm font-medium text-gray-800 whitespace-nowrap">{spec}</span>
                 ))}
               </div>
@@ -241,29 +303,31 @@ function AlternativesSlider({ alternatives }: { alternatives: PartAlternative[] 
   };
 
   return (
-    <div className="w-full max-w-3xl mt-8 sm:mt-10 px-0 sm:px-4 md:px-0 pb-10">
-      <div className="flex items-center gap-2 mb-3 mt-8">
+    <div className="w-full pb-12">
+      <div className="flex flex-col items-center gap-2 mb-5 mt-8">
         <FiRefreshCw className="text-primary w-5 h-5" />
         <h2 className="text-base font-bold text-black">Suggested Alternatives</h2>
       </div>
-      <div className="relative flex flex-col items-center">
+      {/* Slider Row: arrows + card */}
+      <div className="relative flex justify-center items-center w-full max-w-2xl mx-auto px-2 sm:px-6">
         {/* Left Arrow */}
         <button
           aria-label="Previous alternative"
           onClick={() => goTo(index - 1)}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 rounded-full shadow p-2 border border-gray-200 hover:bg-gray-100 active:scale-95 transition disabled:opacity-30"
+          className="absolute left-2 sm:-left-6 top-1/2 -translate-y-1/2 z-10 bg-white/90 rounded-full shadow p-2 border border-gray-200 hover:bg-gray-100 active:scale-95 transition disabled:opacity-30"
+          style={{ boxShadow: '0 2px 8px 0 rgba(27,39,51,0.08)' }}
           disabled={alternatives.length <= 1}
         >
           <FiChevronLeft className="w-6 h-6 text-black" />
         </button>
-        {/* Card Slider */}
+        {/* Card */}
         <div
           className="w-full flex justify-center items-center"
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
-          <div className="mx-auto w-[90vw] max-w-[600px]">
+          <div className="mx-auto w-full max-w-2xl">
             <AlternativeCard alt={alternatives[index]} />
           </div>
         </div>
@@ -271,20 +335,25 @@ function AlternativesSlider({ alternatives }: { alternatives: PartAlternative[] 
         <button
           aria-label="Next alternative"
           onClick={() => goTo(index + 1)}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 rounded-full shadow p-2 border border-gray-200 hover:bg-gray-100 active:scale-95 transition disabled:opacity-30"
+          className="absolute right-2 sm:-right-6 top-1/2 -translate-y-1/2 z-10 bg-white/90 rounded-full shadow p-2 border border-gray-200 hover:bg-gray-100 active:scale-95 transition disabled:opacity-30"
+          style={{ boxShadow: '0 2px 8px 0 rgba(27,39,51,0.08)' }}
           disabled={alternatives.length <= 1}
         >
           <FiChevronRight className="w-6 h-6 text-black" />
         </button>
-        {/* Dots Indicator */}
-        <div className="flex gap-2 mt-4">
-          {alternatives.map((_, i) => (
-            <span
-              key={i}
-              className={`w-2 h-2 rounded-full ${i === index ? 'bg-primary' : 'bg-gray-300'} transition`}
-            />
-          ))}
-        </div>
+      </div>
+      {/* Slide Count Indicator */}
+      <div className="mt-4 text-xs text-gray-500 font-semibold tracking-wide text-center">
+        {index + 1} / {alternatives.length}
+      </div>
+      {/* Dots Indicator */}
+      <div className="flex gap-3 mt-2 justify-center mb-6">
+        {alternatives.map((_, i) => (
+          <span
+            key={i}
+            className={`w-3 h-3 rounded-full border-2 ${i === index ? 'bg-primary border-primary shadow-lg' : 'bg-gray-200 border-gray-300'} transition-all duration-200`}
+          />
+        ))}
       </div>
     </div>
   );
@@ -308,7 +377,7 @@ function AlternativeCard({ alt }: { alt: PartAlternative }) {
       {/* Specs as horizontal pill list */}
       {alt.specs && alt.specs.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-1">
-          {alt.specs.slice(0, 4).map((spec: string, j: number) => (
+          {alt.specs.map((spec: string, j: number) => (
             <span key={j} className="bg-gray-50 border border-gray-200 rounded-full px-3 py-1 text-xs font-medium text-gray-800 whitespace-nowrap">{spec}</span>
           ))}
         </div>
