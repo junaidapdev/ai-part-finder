@@ -59,7 +59,7 @@ Given a user's natural language query, perform the following tasks:
    - "part_number": Official or most likely part number
    - "brand": Manufacturer or recognized brand
    - "description": Functional description of the part
-   - "specs": Exactly **6 key technical specifications** as a bullet-point array (e.g., voltage, current, type, mounting, material, interface, dimensions)
+   - "specs": Exactly **12 key technical specifications** as a bullet-point array (e.g., voltage, current, power, input type, output type, temperature range, mounting type, dimensions, communication protocol, response time, IP rating, housing material)
    - "application": Common or typical use-case context of the part
    - "stock": Use either "In Stock" or "Out of Stock" based on availability cues in the query
 
@@ -68,7 +68,7 @@ Given a user's natural language query, perform the following tasks:
    - Prefer alternatives that are **drop-in replacements** or require **minimal modification**
    - Use only **real, industry-recognized brands** (e.g., Siemens, Allen-Bradley, Omron, Schneider Electric, Mitsubishi, etc.)
    - Include a mix of **premium and cost-effective options**, where applicable
-   - Each alternative must also include **exactly 6 technical specifications**, distinct and relevant
+   - Each alternative must also include **exactly 12 technical specifications**, distinct and relevant
    - Ensure the alternatives vary in terms of **brand, stock availability, or performance trade-offs**
    - Do not suggest outdated, discontinued, or generic placeholder parts
 
@@ -84,7 +84,13 @@ Given a user's natural language query, perform the following tasks:
     "spec 3",
     "spec 4",
     "spec 5",
-    "spec 6"
+    "spec 6",
+    "spec 7",
+    "spec 8",
+    "spec 9",
+    "spec 10",
+    "spec 11",
+    "spec 12"
   ],
   "application": "string",
   "stock": "In Stock" | "Out of Stock",
@@ -99,7 +105,13 @@ Given a user's natural language query, perform the following tasks:
         "spec 3",
         "spec 4",
         "spec 5",
-        "spec 6"
+        "spec 6",
+        "spec 7",
+        "spec 8",
+        "spec 9",
+        "spec 10",
+        "spec 11",
+        "spec 12"
       ],
       "application": "string",
       "stock": "In Stock" | "Out of Stock"
@@ -109,10 +121,10 @@ Given a user's natural language query, perform the following tasks:
 }
 
 **Important Behavior Rules**:
-- Never provide fewer or more than **6 specifications** per part.
-- Use only realistic, verified part information — no imaginary data.
+- Never provide fewer or more than **12 specifications** per part.
+- Use only realistic, verified part information — no imaginary or placeholder data.
 - Alternatives must be based on meaningful equivalence or improvements, not duplicates.
-- Always match the **application use-case** when suggesting alternatives.
+- Match the **application context** when suggesting alternatives.
 `;
       
       
